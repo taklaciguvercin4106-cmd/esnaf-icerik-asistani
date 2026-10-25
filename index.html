@@ -1,165 +1,71 @@
-
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Esnaf Asistanı</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f3f5f9;
-      color: #172033;
-    }
-    header {
-      background: #172033;
-      color: white;
-      padding: 25px 20px;
-      text-align: center;
-    }
-    main {
-      max-width: 760px;
-      margin: 35px auto;
-      padding: 25px;
-    }
-    .panel {
-      background: white;
-      padding: 25px;
-      border-radius: 16px;
-      box-shadow: 0 8px 30px #17203312;
-    }
-    label {
-      display: block;
-      margin: 18px 0 8px;
-      font-weight: bold;
-    }
-    input, select, textarea, button {
-      width: 100%;
-      padding: 13px;
-      border-radius: 9px;
-      font: inherit;
-    }
-    input, select, textarea {
-      border: 1px solid #ccd3df;
-      background: white;
-    }
-    textarea { min-height: 95px; resize: vertical; }
-    button {
-      margin-top: 20px;
-      border: 0;
-      background: #4255e8;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    button:hover { background: #3042cc; }
-    #result {
-      display: none;
-      margin-top: 25px;
-      padding: 20px;
-      border-radius: 12px;
-      background: #f0f3ff;
-      white-space: pre-wrap;
-      line-height: 1.7;
-      overflow-wrap: anywhere;
-    }
-    .note { color: #5e687b; font-size: 14px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Esnaf Asistanı</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f3f5f9;color:#172033}
+header{background:#172033;color:white;text-align:center;padding:30px 16px}
+header h1{margin:0 0 10px}
+main{max-width:780px;margin:30px auto;padding:16px}
+.panel{background:white;padding:24px;border-radius:16px;box-shadow:0 8px 30px #17203312}
+label{display:block;font-weight:bold;margin:17px 0 8px}
+input,select,textarea,button{width:100%;padding:13px;border-radius:9px;font:inherit}
+input,select,textarea{border:1px solid #ccd3df;background:white;color:#172033}
+textarea{min-height:80px;resize:vertical}
+button{border:0;background:#4255e8;color:white;font-weight:bold;cursor:pointer;margin-top:16px}
+button:hover{background:#3042cc}
+.secondary{background:#e8ebff;color:#2637a5}
+#result{display:none;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.7;margin-top:22px;padding:18px;background:#f0f3ff;border-radius:12px}
+.note{font-size:13px;color:#657087}
+@media(max-width:480px){.panel{padding:17px}main{margin:12px auto}}
+</style>
 </head>
 <body>
-  <header>
-    <h1>Esnaf Asistanı</h1>
-    <p>İşletmen için saniyeler içinde içerik fikirleri üret.</p>
-  </header>
-
-  <main>
-    <section class="panel">
-      <h2>İçerik oluştur</h2>
-      <p>Bilgileri doldur ve sana uygun taslakları oluştur.</p>
-
-      <label for="business">İşletme türün</label>
-      <select id="business">
-        <option>Kafe</option>
-        <option>Restoran</option>
-        <option>Giyim mağazası</option>
-        <option>Kuaför</option>
-        <option>E-ticaret</option>
-        <option>Diğer işletme</option>
-      </select>
-
-      <label for="product">Ürün veya hizmetin</label>
-      <input id="product" maxlength="150"
-        placeholder="Örnek: el yapımı çikolatalı pasta">
-
-      <label for="audience">Müşterilerin</label>
-      <input id="audience" maxlength="150"
-        placeholder="Örnek: aileler ve öğrenciler">
-
-      <label for="offer">Kampanya veya özel bilgi (isteğe bağlı)</label>
-      <input id="offer" maxlength="150"
-        placeholder="Örnek: hafta sonu yüzde 10 indirim">
-
-      <label for="type">Ne hazırlayalım?</label>
-      <select id="type">
-        <option value="social">Instagram paylaşımı</option>
-        <option value="product">Ürün açıklaması</option>
-        <option value="ad">Reklam metni</option>
-        <option value="ideas">5 içerik fikri</option>
-      </select>
-
-      <button id="generate">İçeriğimi oluştur</button>
-      <p class="note">Bu ilk sürüm hazır şablonlarla çalışır; henüz yapay zekâ kullanmaz.</p>
-      <div id="result" aria-live="polite"></div>
-      <button id="copy" hidden>Sonucu kopyala</button>
-    </section>
-  </main>
-
-  <script>
-    const $ = id => document.getElementById(id);
-
-    $("generate").addEventListener("click", () => {
-      const business = $("business").value;
-      const product = $("product").value.trim();
-      const audience = $("audience").value.trim() || "değerli müşterilerimiz";
-      const offer = $("offer").value.trim();
-      const type = $("type").value;
-
-      if (!product) {
-        alert("Lütfen ürün veya hizmetini yaz.");
-        $("product").focus();
-        return;
-      }
-
-      const campaign = offer ? " " + offer + "." : "";
-      let output = "";
-
-      if (type === "social") {
-        output = `${product} ile tanışın! ✨\n\n${business} işletmemizde sizler için özenle hazırlanıyor. ${audience} için güzel bir seçenek.${campaign}\n\nSizi bekliyoruz!\n\n#küçükişletme #yerel işletme #${business.toLowerCase().replace(/\s+/g, "")}`;
-      } else if (type === "product") {
-        output = `${product}\n\n${business} işletmemizin öne çıkan seçeneklerinden biri. ${audience} düşünülerek hazırlanan bu ürün veya hizmet hakkında ayrıntılı bilgi almak için bizimle iletişime geçebilirsiniz.${campaign}`;
-      } else if (type === "ad") {
-        output = `ARADIĞINIZ TAM DA BU OLABİLİR!\n\n${product}\n\n${audience} için ${business} işletmemizden bir seçenek.${campaign}\n\nBilgi almak ve detayları öğrenmek için bize ulaşın!`;
-      } else {
-        output = `1. ${product} tanıtımı\n2. Ürünün hazırlanma sürecinden kısa bir video\n3. Sık sorulan bir sorunun cevabı\n4. Müşteri deneyimi paylaşımı (gerçek izinli yorumlarla)\n5. ${offer || product} hakkında soru-cevap paylaşımı`;
-      }
-
-      $("result").textContent = output;
-      $("result").style.display = "block";
-      $("copy").hidden = false;
-    });
-
-    $("copy").addEventListener("click", async () => {
-      try {
-        await navigator.clipboard.writeText($("result").textContent);
-        $("copy").textContent = "Kopyalandı!";
-        setTimeout(() => $("copy").textContent = "Sonucu kopyala", 1800);
-      } catch {
-        alert("Metni seçip Ctrl+C ile kopyalayabilirsin.");
-      }
-    });
-  </script>
+<header><h1>Esnaf Asistanı</h1><p>İşletmen için içerik hazırlamak artık daha kolay.</p></header>
+<main><section class="panel">
+<h2>İçerik oluştur</h2>
+<p>Bilgileri gir, sana uygun bir taslak hazırlayalım.</p>
+<label for="business">İşletme türü</label>
+<select id="business">
+<option>Kafe</option><option>Restoran</option><option>Giyim mağazası</option><option>Kuaför</option><option>Güzellik salonu</option><option>E-ticaret</option><option>Market</option><option>Fırın veya pastane</option><option>Temizlik hizmeti</option><option>Oto servis</option><option>Emlak</option><option>Eğitim veya kurs</option><option>El işi ve takı</option><option>Diğer küçük işletme</option>
+</select>
+<label for="product">Ürün veya hizmetin</label>
+<input id="product" maxlength="150" placeholder="Örnek: el yapımı çikolatalı pasta">
+<label for="audience">Hedef müşterilerin</label>
+<input id="audience" maxlength="150" placeholder="Örnek: aileler ve öğrenciler">
+<label for="offer">Kampanya veya özel bilgi (isteğe bağlı)</label>
+<input id="offer" maxlength="150" placeholder="Örnek: hafta sonu yüzde 10 indirim">
+<label for="kind">Ne hazırlayalım?</label>
+<select id="kind"><option value="social">Instagram gönderisi</option><option value="story">Instagram hikâyesi</option><option value="product">Ürün veya hizmet açıklaması</option><option value="ad">Reklam metni</option><option value="ideas">5 içerik fikri</option></select>
+<label for="tone">Yazı tarzı</label>
+<select id="tone"><option value="friendly">Samimi ve sıcak</option><option value="professional">Profesyonel</option><option value="energetic">Enerjik ve dikkat çekici</option></select>
+<button id="generate">İçeriğimi oluştur</button>
+<div id="result" aria-live="polite"></div>
+<button id="copy" class="secondary" hidden>Sonucu kopyala</button>
+<p class="note">Ücretsiz ilk sürüm hazır şablonlarla çalışır; henüz yapay zekâ kullanmaz. Metinleri paylaşmadan önce bilgilerini kontrol et.</p>
+</section></main>
+<script>
+const $=id=>document.getElementById(id);
+$("generate").addEventListener("click",()=>{
+const business=$("business").value, product=$("product").value.trim(), audience=$("audience").value.trim()||"değerli müşterilerimiz", offer=$("offer").value.trim(), kind=$("kind").value, tone=$("tone").value;
+if(!product){alert("Lütfen ürün veya hizmetini yaz.");$("product").focus();return}
+const intro=tone==="friendly"?"Sizin için özenle hazırladığımız":tone==="professional"?"Kalite ve memnuniyet odaklı":"Kaçırmak istemeyeceğiniz";
+const campaign=offer?"\n\n📣 "+offer:"";
+let out="";
+if(kind==="social")out=product+" ✨\n\n"+intro+" "+product+". "+audience+" için "+business+" işletmemizde sizleri bekliyoruz."+campaign+"\n\nDetaylı bilgi için bize ulaşın!\n\n#küçükişletme #"+business.toLocaleLowerCase("tr-TR").replace(/\s+/g,"");
+else if(kind==="story")out="✨ "+product+"\n\n"+(tone==="energetic"?"Bunu kaçırma!":"Sana güzel bir haberimiz var.")+campaign+"\n\nBilgi almak için bize yaz 💬";
+else if(kind==="product")out=product+"\n\n"+business+" işletmemizde "+audience+" için sunduğumuz seçeneklerden biri. Ürün veya hizmet detayları ve bilgi için bizimle iletişime geçebilirsiniz."+campaign;
+else if(kind==="ad")out="🌟 "+product+"\n\n"+(tone==="professional"?"İhtiyaçlarınıza uygun seçeneklerimizi keşfedin.":"Aradığınız şey burada olabilir!")+" "+audience+" için "+business+" işletmemizden bilgi alın."+campaign+"\n\nBize ulaşın!";
+else out="1. "+product+" tanıtımı\n2. Ürün veya hizmet hazırlanırken kısa video\n3. Sık sorulan bir soruya cevap\n4. İşletmenin hikâyesi\n5. "+(offer||product)+" hakkında soru-cevap";
+$("result").textContent=out;$("result").style.display="block";$("copy").hidden=false;$("copy").textContent="Sonucu kopyala";
+});
+$("copy").addEventListener("click",async()=>{
+try{await navigator.clipboard.writeText($("result").textContent);$("copy").textContent="Kopyalandı!";}
+catch{alert("Metni seçip Ctrl+C ile kopyalayabilirsin.")}
+});
+</script>
 </body>
 </html>
