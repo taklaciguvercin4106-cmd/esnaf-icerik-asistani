@@ -1,0 +1,166 @@
+# esnaf-icerik-asistani
+Esnaflar için içerik oluşturma uygulaması
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Esnaf Asistanı</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f3f5f9;
+      color: #172033;
+    }
+    header {
+      background: #172033;
+      color: white;
+      padding: 25px 20px;
+      text-align: center;
+    }
+    main {
+      max-width: 760px;
+      margin: 35px auto;
+      padding: 25px;
+    }
+    .panel {
+      background: white;
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 8px 30px #17203312;
+    }
+    label {
+      display: block;
+      margin: 18px 0 8px;
+      font-weight: bold;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      padding: 13px;
+      border-radius: 9px;
+      font: inherit;
+    }
+    input, select, textarea {
+      border: 1px solid #ccd3df;
+      background: white;
+    }
+    textarea { min-height: 95px; resize: vertical; }
+    button {
+      margin-top: 20px;
+      border: 0;
+      background: #4255e8;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover { background: #3042cc; }
+    #result {
+      display: none;
+      margin-top: 25px;
+      padding: 20px;
+      border-radius: 12px;
+      background: #f0f3ff;
+      white-space: pre-wrap;
+      line-height: 1.7;
+      overflow-wrap: anywhere;
+    }
+    .note { color: #5e687b; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Esnaf Asistanı</h1>
+    <p>İşletmen için saniyeler içinde içerik fikirleri üret.</p>
+  </header>
+
+  <main>
+    <section class="panel">
+      <h2>İçerik oluştur</h2>
+      <p>Bilgileri doldur ve sana uygun taslakları oluştur.</p>
+
+      <label for="business">İşletme türün</label>
+      <select id="business">
+        <option>Kafe</option>
+        <option>Restoran</option>
+        <option>Giyim mağazası</option>
+        <option>Kuaför</option>
+        <option>E-ticaret</option>
+        <option>Diğer işletme</option>
+      </select>
+
+      <label for="product">Ürün veya hizmetin</label>
+      <input id="product" maxlength="150"
+        placeholder="Örnek: el yapımı çikolatalı pasta">
+
+      <label for="audience">Müşterilerin</label>
+      <input id="audience" maxlength="150"
+        placeholder="Örnek: aileler ve öğrenciler">
+
+      <label for="offer">Kampanya veya özel bilgi (isteğe bağlı)</label>
+      <input id="offer" maxlength="150"
+        placeholder="Örnek: hafta sonu yüzde 10 indirim">
+
+      <label for="type">Ne hazırlayalım?</label>
+      <select id="type">
+        <option value="social">Instagram paylaşımı</option>
+        <option value="product">Ürün açıklaması</option>
+        <option value="ad">Reklam metni</option>
+        <option value="ideas">5 içerik fikri</option>
+      </select>
+
+      <button id="generate">İçeriğimi oluştur</button>
+      <p class="note">Bu ilk sürüm hazır şablonlarla çalışır; henüz yapay zekâ kullanmaz.</p>
+      <div id="result" aria-live="polite"></div>
+      <button id="copy" hidden>Sonucu kopyala</button>
+    </section>
+  </main>
+
+  <script>
+    const $ = id => document.getElementById(id);
+
+    $("generate").addEventListener("click", () => {
+      const business = $("business").value;
+      const product = $("product").value.trim();
+      const audience = $("audience").value.trim() || "değerli müşterilerimiz";
+      const offer = $("offer").value.trim();
+      const type = $("type").value;
+
+      if (!product) {
+        alert("Lütfen ürün veya hizmetini yaz.");
+        $("product").focus();
+        return;
+      }
+
+      const campaign = offer ? " " + offer + "." : "";
+      let output = "";
+
+      if (type === "social") {
+        output = `${product} ile tanışın! ✨\n\n${business} işletmemizde sizler için özenle hazırlanıyor. ${audience} için güzel bir seçenek.${campaign}\n\nSizi bekliyoruz!\n\n#küçükişletme #yerel işletme #${business.toLowerCase().replace(/\s+/g, "")}`;
+      } else if (type === "product") {
+        output = `${product}\n\n${business} işletmemizin öne çıkan seçeneklerinden biri. ${audience} düşünülerek hazırlanan bu ürün veya hizmet hakkında ayrıntılı bilgi almak için bizimle iletişime geçebilirsiniz.${campaign}`;
+      } else if (type === "ad") {
+        output = `ARADIĞINIZ TAM DA BU OLABİLİR!\n\n${product}\n\n${audience} için ${business} işletmemizden bir seçenek.${campaign}\n\nBilgi almak ve detayları öğrenmek için bize ulaşın!`;
+      } else {
+        output = `1. ${product} tanıtımı\n2. Ürünün hazırlanma sürecinden kısa bir video\n3. Sık sorulan bir sorunun cevabı\n4. Müşteri deneyimi paylaşımı (gerçek izinli yorumlarla)\n5. ${offer || product} hakkında soru-cevap paylaşımı`;
+      }
+
+      $("result").textContent = output;
+      $("result").style.display = "block";
+      $("copy").hidden = false;
+    });
+
+    $("copy").addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText($("result").textContent);
+        $("copy").textContent = "Kopyalandı!";
+        setTimeout(() => $("copy").textContent = "Sonucu kopyala", 1800);
+      } catch {
+        alert("Metni seçip Ctrl+C ile kopyalayabilirsin.");
+      }
+    });
+  </script>
+</body>
+</html>
